@@ -1,0 +1,21 @@
+#!/bin/sh
+# cmd-opts: command line option processor
+
+case $# in
+    0) echo "Usage: $0 [-v] [-h] file..." >&2; exit 1 ;;
+esac
+
+for arg in "$@"
+do
+    case $arg in
+	-v) verbose=1 ;;
+	-h) help=1 ;;
+	-*) echo "$0: unknown option $arg" >&2; exit 1 ;;
+	*) files="$files $arg" ;;
+    esac
+done
+
+[ "$verbose" ] && echo "Verbose mode on"
+[ "$help" ] && echo "Help requested"
+echo "Files to process: $files"
+
