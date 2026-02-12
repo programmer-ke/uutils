@@ -1,0 +1,39 @@
+#!/bin/sh
+# robust-script: demonstrate robust scripting
+
+# Set up cleaning on interrupt
+tmpfile=/tmp/safe.$$
+# handles signals:
+# 1  - SIGHUB (hangup)
+# 2  - SIGINT (interrupt from Ctrl-C)
+# 15 - SIGTERM (termination)
+trap 'rm -f $tmpfile; echo "Interrupted - cleaning up" >&2; exit 1' 1 2 15
+
+# Check args
+case $# in
+    0) echo "Usage: $0 inputfile" >&2; exit 2 ;;
+esac
+
+# Check if file exists and is readable
+if [ ! -r "$1" ]
+then
+    echo "$0: cannot read $1" >&2
+    exit 1
+fi
+
+# process with error checking
+if sort "$1" >$tmpfile
+then
+    echo "Processing successful"
+    # do more work here..
+    sleep 10
+    cat $tmpfile
+else
+    echo "$0: sort failed" >&2
+    rm -f $tmpfile
+    exit 1
+fi
+
+# clean up
+rm -f $tmpfile
+
