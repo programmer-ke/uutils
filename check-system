@@ -1,0 +1,32 @@
+#!/bin/sh
+# check-system: system checks using exit status
+
+echo "=== System Check ==="
+
+# Using if statement
+if who | grep -q "^$USER"
+then
+    echo "You are logged in"
+else
+    echo "You are not logged in (unexpected)"
+fi
+
+# using && operator
+test -f /etc/passwd && echo "/etc/passwd exists"
+
+# using || operator
+test -f /nonexistent || echo "/nonexistent doesn't exist"
+
+# Combining them
+grep -q "root" /etc/passwd && echo "Found root" || echo "No root found"
+
+# While loop with exit status
+count=0
+while [ $count -lt 3 ]
+do
+    echo "Attempt $count"
+    count=$((count + 1))
+    # Simulate command that might fail
+    [ $count -eq 2 ] && false
+done
+
