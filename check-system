@@ -27,6 +27,6 @@ do
     echo "Attempt $count"
     count=$((count + 1))
     # Simulate command that might fail
-    [ $count -eq 2 ] && false
+    [ $count -eq 1 ] && false
 done
 

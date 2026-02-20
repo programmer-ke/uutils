@@ -1,0 +1,55 @@
+#!/bin/sh
+# args-demo: show proper argument handling
+
+echo "===Argument Handling Demo==="
+
+# difference between $*, "$*" and "$@"
+echo "Number of arguments: $#"
+echo "Using \$*:"
+for arg in $*
+do
+    echo " Arg: '$arg'"
+done
+
+echo "Using \"\$*\":"
+for arg in "$*"
+do
+    echo " Arg: '$arg'"
+done
+
+echo "Using \"\$@\":"
+for arg in "$@"
+do
+    echo " Arg: '$arg'"
+done
+
+
+# example: process files with spaces in their names
+echo ""
+echo "Processing files:"
+for file in "$@"
+do
+    if [ -f "$file" ]
+    then
+	echo " Found $file"
+	wc -l "$file"
+    else
+	echo " Missing: $file" >&2
+    fi
+done
+
+# example: IFS modification
+echo ""
+echo "Parsing colon separated data"
+data="apple:banana:cherry:date"
+echo "Original data: $data"
+
+# change IFS to colon
+OLDIFS="$IFS"
+IFS=":"
+echo "Splitting by colon:"
+for item in $data
+do
+    echo " Item: $item"
+done
+IFS="$OLDIFS"  # restore original IFS
