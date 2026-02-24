@@ -1,0 +1,56 @@
+#!/bin/sh
+# file-search: find files containing text with options
+
+PATH=/bin:/usr/bin
+
+# Default values
+pattern=""
+directory="."
+case_sensitive=1
+show_count=0
+
+# parse options
+while [ $# -gt 0 ]
+do
+    case $1 in
+	-i) case_sensitive=0 ;;
+	-c) show_count=1 ;;
+	-d) directory="$2"; shift ;;
+	-*) echo "Usage: $0 [-i] [-c] [-d dir] pattern" >&2; exit 1 ;;
+	*) pattern="$1" ;;
+    esac
+    shift
+done
+
+[ -z "$pattern" ] && { echo "Pattern required" >&2; exit 1; }
+
+
+# Build the grep command
+if [ $case_sensitive -eq 0 ]
+then
+    grep_cmd="grep -i"
+else
+    grep_cmd="grep"
+fi
+
+if [ $show_count -eq 1 ]
+then
+    grep_cmd="$grep_cmd -c"
+fi
+
+# Find and process files
+echo "Searching for '$pattern' in $directory"
+find "$directory" -type f -print | while read file
+do
+    if $grep_cmd -q "$pattern" "$file" 2>/dev/null
+    then
+	if [ $show_count -eq 1 ]
+	then
+	   count=`$grep_cmd "$pattern" "$file" 2>/dev/null`
+	   echo "$count: $file"
+	else
+	    echo "$file"
+	    $grep_cmd "$pattern" "$file" 2>/dev/null | sed 's/^/  /'
+	fi
+    fi
+done
