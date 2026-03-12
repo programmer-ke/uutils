@@ -1,0 +1,21 @@
+# news: print news files
+
+HOME=.
+cd .
+IFS='
+'       # separate by newline, not whitespace
+
+for i in `ls -t * $HOME/.news_time 2>&1`
+do
+    IFS=' '
+    case $i in
+	*'No such file or directory') ;;
+	*/.news_time) break ;;
+	*)            set X`ls -l $i`
+		      echo "
+$i: ($3) $6 $7 $8
+"
+		      cat $i
+    esac
+done
+touch $HOME/.news_time
