@@ -9,4 +9,3 @@ do
 	q*) break
     esac
 done </dev/tty
-

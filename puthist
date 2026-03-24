@@ -1,0 +1,31 @@
+# puthist: install file into history
+
+case $# in
+    1) HIST=$1.H ;;
+    *) echo "usage: puthist file" 1>&2; exit 1 ;;
+esac
+
+if test ! -r $1
+then
+    echo "puthist: can't read $1" 1>&2
+    exit 1
+fi
+
+trap 'rm -f /tmp/puthist.[ab]$$; exit 1' 1 2 15  # hangup, interrupt or terminate
+echo -n "Summary: "
+read Summary
+
+if gethist -o /tmp/puthist.a$$ $1  # previous version
+then  # merge pieces
+    cp $1 /tmp/puthist.b$$
+    echo "@@@ `whoami` `date` $Summary" >>/tmp/puthist.b$$
+    diff -e $1 /tmp/puthist.a$$ >>/tmp/puthist.b$$  # latest diffs
+    sed -n '/^@@@/,$p' <$HIST >>/tmp/puthist.b$$ # old diffs
+    overwrite $HIST cat /tmp/puthist.b$$   # put it back
+else  # make a new one
+    echo "puthist: Creating $HIST"
+    cp $1 $HIST
+    echo "@@@ `whoami` `date` $Summary" >>$HIST
+fi
+
+rm -f /tmp/puthist.[ab]$$
