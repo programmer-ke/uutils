@@ -24,10 +24,11 @@ int mysystem(char *s) {  // run command line 2
   }
 
   if ((pid = fork()) == 0) {
-    close(0); dup(tty);
-    close(1); dup(tty);
-    close(2); dup(tty);
-    close(tty);
+    // this block runs in child process
+    close(0); dup(tty);  // bind tty to stdin
+    close(1); dup(tty);  // bind tty to stdout
+    close(2); dup(tty);  // bind tty to stderr
+    close(tty);          // close extra tty file descriptor
     execlp("sh", "sh", "-c", s, (char *) 0);
     exit(127);
   }
@@ -37,6 +38,7 @@ int mysystem(char *s) {  // run command line 2
   qstat = signal(SIGQUIT, SIG_IGN);
 
   while((w = wait(&status)) != pid && w != -1)
+    // in parent, wait until child of pid exits, or error
     ;
   if (w == -1)
     status = -1;
